@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="jdw.preprocess.jdw">
+
+  <target name="dita2preprocess.jdw" 
+          depends="build-init, 
+          preprocess2.preprocess.jdw">
+  </target>
+
+  <!-- jdw 09-16-2023 removed add-identifiers and numbering targets -->
+  <target name="preprocess2.preprocess.jdw" description="Preprocess JDW" 
+         depends="preprocess2.init,
+                  ditaval-merge,
+                  
+                  preprocess2.maps,
+                  preprocess2.topics.preprocess.jdw
+                  ">
+    <dirname property="_dita.map.output.dir" file="${dita.output.dir}/${user.input.file}"/>
+    <dirname property="_dita.map.temp.dir" file="${dita.temp.dir}/${user.input.file}"/>
+    <property name="uplevels" value=""/>
+    <property name="dita.map.output.dir" location="${_dita.map.output.dir}/${uplevels}"/>
+  </target>
+
+  <target name="preprocess2.topics.preprocess.jdw" 
+    depends="topic-reader,
+    topic-branch-filter,
+    topic-keyref,
+    topic-copy-to,
+    topic-conrefpush,
+    topic-conref,
+    topic-profile,
+    preprocess2.topic-fragment,
+    topic-chunk,
+    find-figs
+    "/>
+  
+  <!-- 
+    ,
+    
+    find-figs
+    
+    
+    number-topics,
+    
+    number-descendants,
+    topic-move-meta-entries, 
+    add-numbers-to-titles, 
+    
+    topic-maplink,
+    topic-topicpull
+  
+-->
+  
+  <target name="find-figs">
+    <pipeline message="Find figures in topics" taskname="find-figures">
+      <xslt basedir="${dita.temp.dir}"
+        style="${dita.plugin.com.jdwinfodesign.preprocess.dir}/xsl/find-figs.xsl">
+        <ditaFileset format="ditamap" input="true"/>
+        <xmlcatalog refid="dita.catalog"/>
+      </xslt>
+    </pipeline>
+  </target>
+
+</project>
