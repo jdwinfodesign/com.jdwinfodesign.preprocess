@@ -17,20 +17,20 @@
 
   <xsl:template match="*[contains(@class, ' bookmap/chapter ')]">
     <xsl:copy>
-      <!--      <xsl:apply-templates select="@*"/>
+      <xsl:apply-templates select="@*"/>
       <xsl:sequence select="document(@href)/*[contains(@class, ' topic/topic ')]"/>
-      <xsl:apply-templates/>-->
+      <xsl:apply-templates/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="
+      *[contains(@class, ' map/topicref ')][not(contains(@class, ' bookmap/appendix-reference '))]
+      [@href]
+      [ancestor-or-self::*[contains(@class, ' bookmap/chapter ') or contains(@class, ' bookmap/appendix ')]]">
+    <xsl:copy>
+      <xsl:apply-templates select="@*"/>
       <xsl:sequence select="document(@href)/*[contains(@class, ' topic/topic ')]"/>
-      <xsl:for-each select="child::*[contains(@class, ' map/topicref ')]">
-        <xsl:comment>
-        <xsl:value-of select="@href"/>
-      </xsl:comment>
-        <xsl:for-each select="child::*[contains(@class, ' map/topicref ')]">
-          <xsl:comment>
-        <xsl:value-of select="@href"/>
-      </xsl:comment>
-        </xsl:for-each>
-      </xsl:for-each>
+      <xsl:apply-templates/>
     </xsl:copy>
   </xsl:template>
 
