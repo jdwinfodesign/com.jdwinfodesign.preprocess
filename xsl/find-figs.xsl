@@ -16,14 +16,29 @@
   </xsl:template>
 
   <xsl:template match="*[contains(@class, ' bookmap/chapter ') or contains(@class, ' bookmap/appendix ')]">
-    <xsl:copy>
+<!--    <xsl:copy>
       <xsl:apply-templates select="@*"/>
       <xsl:sequence select="document(@href)/*[contains(@class, ' topic/topic ')]"/>
       <xsl:apply-templates/>
-    </xsl:copy>
+    </xsl:copy>-->
+    
+    <xsl:variable name="number">
+      <xsl:value-of select="count(preceding::fig) + 1"/>
+    </xsl:variable>
+    
+    <ol>
+      <xsl:for-each select="descendant-or-self::*[contains(@class, ' map/topicref ')]">
+        <xsl:for-each select="document(@href)//fig">
+          <li><xsl:value-of select="count(preceding::fig)[1] + 1"/></li>
+        </xsl:for-each>
+      </xsl:for-each>
+    </ol>
+    
   </xsl:template>
 
-  <xsl:template match="
+<!-- This worked perfectly to produce copies of topics as descendants of chapters above  
+    
+    <xsl:template match="
       *[contains(@class, ' map/topicref ')][not(contains(@class, ' bookmap/appendix-reference '))]
       [@href]
       [ancestor-or-self::*[contains(@class, ' bookmap/chapter ') or contains(@class, ' bookmap/appendix ')]]">
@@ -32,7 +47,9 @@
       <xsl:sequence select="document(@href)/*[contains(@class, ' topic/topic ')]"/>
       <xsl:apply-templates/>
     </xsl:copy>
-  </xsl:template>
+  </xsl:template>-->
+  
+  
 
   <!-- 
   /bookmap/
@@ -40,6 +57,7 @@
                        topicref[1]/
                                    topicref[1]/
                                                concept[1]/conbody[1]/p[3]/fig[1]
+   /bookmap/chapter[1]/topicref[1]/topicref[1]/concept[1]/conbody[1]/p[3]/fig[1]
   -->
 
 </xsl:stylesheet>
