@@ -15,7 +15,7 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="*[contains(@class, ' bookmap/chapter ')]">
+  <xsl:template match="*[contains(@class, ' bookmap/chapter ') or contains(@class, ' bookmap/appendix ')]">
     <xsl:copy>
       <xsl:apply-templates select="@*"/>
       <xsl:sequence select="document(@href)/*[contains(@class, ' topic/topic ')]"/>
