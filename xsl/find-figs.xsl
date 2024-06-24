@@ -31,7 +31,9 @@
   </xsl:template>
   
   <xsl:template match="fig">
-    <xsl:copy>foo</xsl:copy>
+    <fig>
+      <xsl:value-of select="name(../../..)"/>
+    </fig>
   </xsl:template>
 
   <!-- 
