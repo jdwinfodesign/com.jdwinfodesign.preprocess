@@ -6,6 +6,7 @@
   <xsl:import href="plugin:org.dita.base:xsl/common/dita-utilities.xsl"/>
   <xsl:import href="plugin:org.dita.base:xsl/common/output-message.xsl"/>
   <xsl:variable name="msgprefix" select="''"/>
+  <xsl:variable name="newline">&#10;</xsl:variable>
 
   <xsl:output method="xml" indent="yes"/>
 
@@ -15,43 +16,27 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="*[contains(@class, ' bookmap/chapter ') or contains(@class, ' bookmap/appendix ')]">
-<!--    <xsl:copy>
-      <xsl:apply-templates select="@*"/>
-      <xsl:sequence select="document(@href)/*[contains(@class, ' topic/topic ')]"/>
-      <xsl:apply-templates/>
-    </xsl:copy>-->
-    
-    <xsl:variable name="number">
-      <xsl:value-of select="count(preceding::fig) + 1"/>
-    </xsl:variable>
-    
-    <ol>
-      <xsl:for-each select="descendant-or-self::*[contains(@class, ' map/topicref ')]">
-        <xsl:for-each select="document(@href)//fig">
-          <li><xsl:value-of select="count(preceding::fig)[1] + 1"/></li>
-        </xsl:for-each>
-      </xsl:for-each>
-    </ol>
-    
-  </xsl:template>
 
-<!-- This worked perfectly to produce copies of topics as descendants of chapters above  
-    
-    <xsl:template match="
-      *[contains(@class, ' map/topicref ')][not(contains(@class, ' bookmap/appendix-reference '))]
-      [@href]
-      [ancestor-or-self::*[contains(@class, ' bookmap/chapter ') or contains(@class, ' bookmap/appendix ')]]">
+  <xsl:template match="*[contains(@class, ' map/topicref ')]">
     <xsl:copy>
-      <xsl:apply-templates select="@*"/>
-      <xsl:sequence select="document(@href)/*[contains(@class, ' topic/topic ')]"/>
+<!--      <xsl:apply-templates select="@*"/>-->
+      <!-- NOTE: If you want to write templates for the external document 
+           you pull in, you have to use 
+           apply-templates here, 
+           not
+           value-of or sequence -->
+      <xsl:apply-templates select="document(@href)/*[contains(@class, ' topic/topic ')]"/>
       <xsl:apply-templates/>
     </xsl:copy>
-  </xsl:template>-->
+  </xsl:template>
   
-  
+  <xsl:template match="fig">
+    <xsl:copy>foo</xsl:copy>
+  </xsl:template>
 
   <!-- 
+    /bookmap/chapter[1]/concept[1]/conbody[1]/fig[1]
+    
   /bookmap/
             chapter[1]/
                        topicref[1]/
