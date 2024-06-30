@@ -16,15 +16,14 @@
     </xsl:copy>
   </xsl:template>
 
-
-  <xsl:template match="*[contains(@class, ' map/topicref ')]">
-    <xsl:copy>
-<!--      <xsl:apply-templates select="@*"/>-->
-      <!-- NOTE: If you want to write templates for the external document 
+  <!-- NOTE: If you want to write templates for the external document 
            you pull in, you have to use 
            apply-templates here, 
            not
            value-of or sequence -->
+  <xsl:template match="*[contains(@class, ' map/topicref ')]">
+    <xsl:copy>
+      <xsl:apply-templates select="@*"/>
       <xsl:apply-templates select="document(@href)/*[contains(@class, ' topic/topic ')]"/>
       <xsl:apply-templates/>
     </xsl:copy>
@@ -32,7 +31,7 @@
   
   <xsl:template match="fig">
     <fig>
-      <xsl:value-of select="name(../../..)"/>
+      <xsl:value-of select="count(preceding::fig)"/>
     </fig>
   </xsl:template>
 

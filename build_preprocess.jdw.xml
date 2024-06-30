@@ -31,18 +31,20 @@
     topic-profile,
     preprocess2.topic-fragment,
     topic-chunk,
+    
+    number-topics,
+    
     find-figs
+    
     "/>
   
   <!-- 
-    ,
     
-    find-figs
+    find-figs,
     
     
     number-topics,
     
-    number-descendants,
     topic-move-meta-entries, 
     add-numbers-to-titles, 
     
@@ -50,6 +52,29 @@
     topic-topicpull
   
 -->
+  
+  <!-- Add a topic number to all topics that go in the TOC. -->
+  <target name="number-topics">
+    <pipeline message="Add numbers to topicrefs" taskname="number-topics">
+      <xslt basedir="${dita.temp.dir}"
+        style="${dita.plugin.com.jdwinfodesign.preprocess.dir}/xsl/add-topic-numbers.xsl">
+        <ditaFileset format="ditamap" input="true"/>
+        <xmlcatalog refid="dita.catalog"/>
+      </xslt>
+    </pipeline>
+  </target>
+  
+  <!-- Move generated topic numbers into the title. -->
+  <target name="add-numbers-to-titles">
+    <pipeline message="Add numbers to topicrefs" taskname="number-topics">
+      <xslt basedir="${dita.temp.dir}"
+        style="${dita.plugin.com.jdwinfodesign.preprocess.dir}/xsl/prefix-titles-with-numbers.xsl">
+        <ditaFileset format="ditamap" input="true"/>
+        <ditaFileset format="dita" processingRole="normal"/>
+        <xmlcatalog refid="dita.catalog"/>
+      </xslt>
+    </pipeline>
+  </target>
   
   <target name="find-figs">
     <pipeline message="Find figures in topics" taskname="find-figures">
