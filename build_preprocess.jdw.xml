@@ -30,7 +30,9 @@
     topic-conref,
     topic-profile,
     preprocess2.topic-fragment,
-    topic-chunk
+    topic-chunk,
+    
+    number-topics
     
     "/>
   
@@ -72,7 +74,7 @@
   <target name="find-figs">
     <pipeline message="Find figures in topics" taskname="find-figures">
       <xslt basedir="${dita.temp.dir}"
-        style="${dita.plugin.com.jdwinfodesign.preprocess.dir}/xsl/find-figs.xsl">
+        style="${dita.plugin.com.jdwinfodesign.preprocess.dir}/xsl/add-figure-numbers.xsl">
         <ditaFileset format="ditamap" input="true"/>
         <xmlcatalog refid="dita.catalog"/>
       </xslt>
