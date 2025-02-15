@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  This file is part of the DITA Open Toolkit project.
+  See the accompanying license.txt file for applicable licenses.
+-->
+<project name="preprocess.jdwinfodesign">
+
+  <target name="dita2preprocess.jdwinfodesign" 
+          depends="build-init, 
+          preprocess2.jdwinfodesign">
+  </target>
+
+  <!-- jdw 09-16-2023 moved to topics target below add-identifiers -->
+  <target name="preprocess2.jdwinfodesign" description="Preprocess 2 jdw" 
+         depends="preprocess2.init,
+                  ditaval-merge,
+                  
+                  preprocess2.maps,
+                  preprocess2.topics.jdwinfodesign,
+                  
+                  map-clean-map,
+                  clean-preprocess,
+                  copy-files2">
+    <!-- 
+      
+      
+    -->
+    <dirname property="_dita.map.output.dir" file="${dita.output.dir}/${user.input.file}"/>
+    <dirname property="_dita.map.temp.dir" file="${dita.temp.dir}/${user.input.file}"/>
+    <property name="uplevels" value=""/>
+    <property name="dita.map.output.dir" location="${_dita.map.output.dir}/${uplevels}"/>
+  </target>
+
+  <!-- Here is where the topics get numbered,       -->
+  <!-- ⇊  right after topic-chunk.            ⇊    -->
+  <!-- Add a target to count the figs in a topic    -->
+  <!-- removing number-topics from depends for test -->
+  <!-- ⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊⇊ -->
+  
+  <target name="preprocess2.topics.jdwinfodesign"
+    depends="topic-reader,
+    topic-branch-filter,
+    topic-map-conref,
+    topic-keyref,
+    topic-copy-to,
+    topic-conrefpush,
+    topic-conref,
+    topic-profile,
+    preprocess2.topic-fragment,
+    topic-chunk,
+    
+    add-identifiers,
+    number-topics,
+    
+    list-figs,
+    number-figs, 
+    add-fig-nums,
+    
+    list-tables,
+    number-tables, 
+    add-table-nums,
+    
+    topic-move-meta-entries,
+    add-numbers-to-titles,
+    topic-maplink,
+    topic-topicpull
+    "
+  />
+  <!-- ============================================================= -->
+  <!-- Add ID attribute to all block level elements -->
+  <target name="add-identifiers">
+    <pipeline message="Add IDs to blocks" taskname="add-identifiers">
+      <xslt basedir="${dita.temp.dir}"
+        style="${dita.plugin.com.jdwinfodesign.preprocess.dir}/xsl/add-identifiers.xsl">
+        <ditaFileset format="dita"/>
+        <xmlcatalog refid="dita.catalog"/>
+      </xslt>
+    </pipeline>
+  </target>
+
+  <!-- Add a topic number to all topics that go in the TOC. -->
+  <target name="number-topics">
+    <echo message="plugin: ${dita.plugin.com.jdwinfodesign.preprocess.dir}"/>
+    <pipeline message="Add numbers to topicrefs" taskname="number-topics">
+      <xslt basedir="${dita.temp.dir}"
+        style="${dita.plugin.com.jdwinfodesign.preprocess.dir}/xsl/add-topic-numbers.xsl">
+        <ditaFileset format="ditamap" input="true"/>
+        <xmlcatalog refid="dita.catalog"/>
+      </xslt>
+    </pipeline>
+  </target>
+  
+  <!-- ============================================================= -->
+  <!-- ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| -->
+  
+  <!-- list figures for numbering, using the map with the hashed name as input -->
+  <target name="list-figs" depends="read-job">
+    <echo message="target: list-figs"/>
+    <xmlproperty file="${dita.temp.dir}/jobCopy.xml" keeproot="false"/>
+    <echo>================================</echo>
+    <echo>${mainMap}</echo>
+    <echo>${hashMap}</echo>
+    <echo>================================</echo>
+    <pipeline message="Listing figs" taskname="number-figs">
+      <xslt basedir="${dita.temp.dir}"
+        style="${dita.plugin.com.jdwinfodesign.preprocess.dir}/xsl/list-figs.xsl"
+        in="${dita.temp.dir}/${hashMap}"
+        out="${dita.temp.dir}/list.xml">
+      </xslt>
+    </pipeline>
+  </target>
+  
+  <target name="number-figs">
+    <echo message="target: number-figs"/>
+    <echo message="$args.input: ${args.input}"/>
+    <pipeline message="Numbering figs" taskname="number-figs">
+      <xslt basedir="${dita.temp.dir}"
+        style="${dita.plugin.com.jdwinfodesign.preprocess.dir}/xsl/num-figs.xsl"
+        in="${dita.temp.dir}/list.xml"
+        out="${dita.temp.dir}/num-figs.xml">
+      </xslt>
+    </pipeline>
+  </target>
+  
+  <!-- Add fig numbers. -->
+  <target name="add-fig-nums">
+    <echo message="target: add-fig-nums"/>
+    <property name="fig-num-file" value="${dita.temp.dir}/num-figs.xml"/>
+    <pipeline message="Add numbers to figs" taskname="number-figures">
+      <xslt basedir="${dita.temp.dir}"
+        style="${dita.plugin.com.jdwinfodesign.preprocess.dir}/xsl/add-fig-numbers.xsl">
+        <ditaFileset format="ditamap" input="true"/>
+        <ditaFileset format="dita"/>
+        <xmlcatalog refid="dita.catalog"/>
+        <param name="dita.temp.dir" expression="${dita.temp.dir}"/>
+        <param name="fig.num.file" expression="${fig-num-file}"/>
+      </xslt> 
+    </pipeline>
+  </target>
+  
+  <!-- list tables for numbering, using the map with the hashed name as input -->
+  <target name="list-tables" depends="read-job">
+    <echo message="target: list-tables"/>
+    <xmlproperty file="${dita.temp.dir}/jobCopy.xml" keeproot="false"/>
+    <echo>================================</echo>
+    <echo>${mainMap}</echo>
+    <echo>${hashMap}</echo>
+    <echo>================================</echo>
+    <pipeline message="Listing tables" taskname="number-tables">
+      <xslt basedir="${dita.temp.dir}"
+        style="${dita.plugin.com.jdwinfodesign.preprocess.dir}/xsl/list-tables.xsl"
+        in="${dita.temp.dir}/${hashMap}"
+        out="${dita.temp.dir}/list.xml">
+      </xslt>
+    </pipeline>
+  </target>
+  
+  <target name="number-tables">
+    <echo message="target: number-tables"/>
+    <echo message="$args.input: ${args.input}"/>
+    <pipeline message="Numbering tables" taskname="number-tables">
+      <xslt basedir="${dita.temp.dir}"
+        style="${dita.plugin.com.jdwinfodesign.preprocess.dir}/xsl/num-tables.xsl"
+        in="${dita.temp.dir}/list.xml"
+        out="${dita.temp.dir}/num-tables.xml">
+      </xslt>
+    </pipeline>
+  </target>
+  
+  <!-- Add table numbers. -->
+  <target name="add-table-nums">
+    <echo message="target: add-table-nums"/>
+    <property name="table-num-file" value="${dita.temp.dir}/num-tables.xml"/>
+    <pipeline message="Add numbers to tables" taskname="number-tables">
+      <xslt basedir="${dita.temp.dir}"
+        style="${dita.plugin.com.jdwinfodesign.preprocess.dir}/xsl/add-table-numbers.xsl">
+        <ditaFileset format="ditamap" input="true"/>
+        <ditaFileset format="dita"/>
+        <xmlcatalog refid="dita.catalog"/>
+        <param name="dita.temp.dir" expression="${dita.temp.dir}"/>
+        <param name="table.num.file" expression="${table-num-file}"/>
+      </xslt> 
+    </pipeline>
+  </target>
+  
+  <!-- Catches all numbered descendant elements of topic -->
+  <!-- Get the hashed name of the main map -->
+  <!-- .job file, target not in use -->
+  <target name="read-job">
+    <echo message="target: read-job"/>
+    <pipeline message="Get hashed name of main map" taskname="read .job.xml">
+      <xslt basedir="${dita.temp.dir}"
+        style="${dita.plugin.com.jdwinfodesign.preprocess.dir}/xsl/read-job.xsl"
+        in="${dita.temp.dir}/.job.xml"
+        out="${dita.temp.dir}/jobCopy.xml">
+        <param name="args.input" expression="${args.input}"/>
+      </xslt>
+    </pipeline>
+  </target>
+  
+  <!-- |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| -->
+  <!-- ============================================================================ -->
+  
+  <!-- Move generated topic numbers into the title. -->
+  <target name="add-numbers-to-titles">
+    <pipeline message="Add numbers to topicrefs" taskname="number-topics">
+      <xslt basedir="${dita.temp.dir}"
+        style="${dita.plugin.com.jdwinfodesign.preprocess.dir}/xsl/prefix-titles-with-numbers.xsl">
+        <ditaFileset format="ditamap" input="true"/>
+        <ditaFileset format="dita" processingRole="normal"/>
+        <xmlcatalog refid="dita.catalog"/>
+      </xslt>
+    </pipeline>
+  </target>
+
+</project>

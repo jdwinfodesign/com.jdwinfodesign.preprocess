@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin id="com.jdwinfodesign.preprocess">
+	<require plugin="org.dita.normalize"/>
+	<transtype name="preprocess.jdwinfodesign" desc="jdwInfoDesign preprocess"/>
+	<feature extension="ant.import" file="build_preprocess.jdwinfodesign.xml"/>
+	<feature extension="dita.conductor.html5.param" file="params.xml"/>
+</plugin>
